@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multi-Page Layout</title>
+    <style>
+        /* Basic reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        .page { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
+        .page.active { display: block; opacity: 1; }
+        .page h1 { font-size: 50px; margin-bottom: 20px; }
+        .input-field {
+            width: 100%; padding: 10px; margin: 10px 0;
+            font-size: 16px; border: 1px solid #ccc; border-radius: 5px;
+        }
+        .btn {
+            padding: 10px 20px; font-size: 18px; cursor: pointer;
+            background-color: #4CAF50; color: white; border: none; border-radius: 5px;
+        }
+        .btn:hover { background-color: #45a049; }
+        .error { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="firstPage" class="page active">
+            <h1>Welcome</h1>
+            <button id="startButton" class="btn">Start</button>
+        </div>
+        <div id="secondPage" class="page">
+            <h1>Enter Your Details</h1>
+            <input type="text" id="nameInput" class="input-field" placeholder="Enter Your Name">
+            <input type="text" id="rollNoInput" class="input-field" placeholder="Enter Your Roll No">
+            <input type="text" id="sectionInput" class="input-field" placeholder="Enter Your Section">
+            <input type="text" id="sucidInput" class="input-field" placeholder="Enter Your SUCID">
+            <button id="submitButton" class="btn">Submit</button>
+            <p id="errorMessage" class="error"></p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('startButton').addEventListener('click', function() {
+            document.getElementById('firstPage').classList.remove('active');
+            document.getElementById('secondPage').classList.add('active');
+        });
+
+        document.getElementById('submitButton').addEventListener('click', async function () {
+            var name = document.getElementById('nameInput').value;
+            var rollNo = document.getElementById('rollNoInput').value;
+            var section = document.getElementById('sectionInput').value;
+            var sucid = document.getElementById('sucidInput').value;
+            var errorMessage = document.getElementById('errorMessage');
+
+            if (!name || !rollNo || !section || !sucid) {
+                errorMessage.textContent = 'All fields are required!';
+            } else {
+                try {
+                    const response = await fetch('/submit/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            name: name,
+                            roll_no: rollNo,
+                            section: section,
+                            sucid: sucid
+                        })
+                    });
+
+                    if (response.ok) {
+                        errorMessage.textContent = 'Form submitted successfully!';
+                    } else {
+                        errorMessage.textContent = 'Submission failed!';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    errorMessage.textContent = 'An error occurred!';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
